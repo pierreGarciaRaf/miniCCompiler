@@ -1,0 +1,3 @@
+
+src/test/out/*
+!src/test/out/.gitkeep
