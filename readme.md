@@ -1,1 +1,1 @@
-Projet de Lucas Foissey et Pierre Garcia
+Projet de Lucas Foissey et Pierre Garcia. :)
