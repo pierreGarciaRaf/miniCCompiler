@@ -2,6 +2,7 @@
 src/test/out/*
 !src/test/out/.gitkeep
 
+test2/
 
 src/out/*
 !src/out/.gitkeep
