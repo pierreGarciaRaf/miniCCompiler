@@ -14,7 +14,7 @@ make:
 	ocamlc -c lexer.ml; \
 	ocamlc -c parser.ml; \
 	ocamlc -c compiler.ml; \
-	ocamlc -o ../Mc++ mc.cmo lexer.cmo parser.cmo compiler.cmo 
+	ocamlc -o ../Mcc mc.cmo lexer.cmo parser.cmo compiler.cmo 
 
 
 
