@@ -38,8 +38,9 @@ type expr =
 
 let _ =
   try
-    let lexbuf = Lexing.from_channel stdin in
-    while true do
+    let ic = open_in "testFile.mc" in
+    let lexbuf = Lexing.from_channel ic in
+  while true do
       let result = Parser.main Lexer.token lexbuf in
         print_int result; print_newline(); flush stdout
     done
