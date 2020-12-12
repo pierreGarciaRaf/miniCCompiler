@@ -6,14 +6,16 @@
 %token PLUS TIMES
 %token LT
 %token LPAREN RPAREN
-
+%token <string> IDENT
 
 %token PUTCHAR
 %token EQUAL
 %token RETURN
 
+%token SEMI
 
-%token <string> IDENT
+
+
 
 
 %token EOF
@@ -23,11 +25,14 @@
 %left TIMES
 
 %start main             /* the entry point */
-%type <Mc.instr> main
+%type <Mc.seq> main
 %%
 main:
-    instr EOF                { $1 }
+    seq EOF                { $1 }
 ;
+seq :
+  instr SEMI seq                  { $1::$3 }
+  | instr SEMI                      { [$1] }
 instr:
   PUTCHAR LPAREN expr RPAREN      { Putchar ($3) }
   | IDENT EQUAL expr              { Set ($1,$3) }

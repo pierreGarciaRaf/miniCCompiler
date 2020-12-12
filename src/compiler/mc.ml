@@ -47,9 +47,20 @@ let rec getStrExprTree (exprTree : expr) : string=
 
 let getStrInstr (instruction : instr) : string=
   match instruction with
-    | Putchar(value)  -> Printf.sprintf "putchar (%s);" (getStrExprTree value)
-    | Return(value)  -> Printf.sprintf "return (%s);" (getStrExprTree value)
-    | Expr(value)  -> Printf.sprintf "execute (%s);" (getStrExprTree value)
-    | Set(ident,value)  -> Printf.sprintf "var %s = %s;" (ident) (getStrExprTree value)
+    | Putchar(value)  -> Printf.sprintf "putchar (%s)" (getStrExprTree value)
+    | Return(value)  -> Printf.sprintf "return (%s)" (getStrExprTree value)
+    | Expr(value)  -> Printf.sprintf "execute (%s)" (getStrExprTree value)
+    | Set(ident,value)  -> Printf.sprintf "var %s = %s" (ident) (getStrExprTree value)
     | _           -> "undefined instr"
-;
+;;
+
+let getStrSeq (instrSeq : seq) : string=
+  let rec getStrSeq (instrSeq : seq) (acc: string): string=
+    match instrSeq with
+      |[]     -> Printf.sprintf "%s;" acc
+      |hd::tl -> getStrSeq tl (Printf.sprintf "%s;\n%s" acc (getStrInstr hd))
+  in
+  match instrSeq with
+    |[]     -> Printf.sprintf "EMPTY????"
+    |hd::tl -> getStrSeq tl (Printf.sprintf "%s" (getStrInstr hd))
+;;
