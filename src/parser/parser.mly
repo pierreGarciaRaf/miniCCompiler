@@ -7,17 +7,9 @@
 %token LT
 %token LPAREN RPAREN
 
-(*
-%token IF THEN ELSE
-%token WHILE
 
-%token CALL
-%token RETURN
-%token EXPR
-%token SEQ
-%nonassoc UMINUS
+%token PUTCHAR
 
-*)
 
 %token EOF
 
@@ -26,11 +18,13 @@
 %left TIMES
 
 %start main             /* the entry point */
-%type <Mc.expr> main
+%type <Mc.instr> main
 %%
 main:
-    expr EOF                { $1 }
+    instr EOF                { $1 }
 ;
+instr:
+  PUTCHAR LPAREN expr RPAREN   { Putchar ($3) }
 expr:
     CST                         { Cst ($1) }
     | LPAREN expr RPAREN        { $2 }

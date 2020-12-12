@@ -36,11 +36,17 @@ type prog = {
   functions: fun_def list;
 }
 
-let rec getStrExprTree exprTree=
+let rec getStrExprTree (exprTree : expr) : string=
     match exprTree with
       | Cst(x)    -> Printf.sprintf "Cst %i" x
       | Add(x,y)  -> Printf.sprintf "Add(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Mul(x,y)  -> Printf.sprintf "Mul(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Lt(x,y)   -> Printf.sprintf "Lt(%s, %s)"  (getStrExprTree x) (getStrExprTree y)
-      | _ -> Printf.sprintf "?"
+      | _ -> "undefined expr"
+;;
+
+let getStrInstr (instruction : instr) : string=
+  match instruction with
+    | Putchar(x)  -> Printf.sprintf "Putchar (%s);" (getStrExprTree x)
+    | _           -> "undefined instr"
 ;
