@@ -10,6 +10,8 @@
 
 %token PUTCHAR
 %token EQUAL
+%token RETURN
+
 
 %token <string> IDENT
 
@@ -29,6 +31,8 @@ main:
 instr:
   PUTCHAR LPAREN expr RPAREN      { Putchar ($3) }
   | IDENT EQUAL expr              { Set ($1,$3) }
+  | RETURN expr                   { Return ($2) }
+  | expr                          { Expr ($1) }
 expr:
   CST                           { Cst ($1) }
   | LPAREN expr RPAREN          { $2 }

@@ -47,7 +47,9 @@ let rec getStrExprTree (exprTree : expr) : string=
 
 let getStrInstr (instruction : instr) : string=
   match instruction with
-    | Putchar(value)  -> Printf.sprintf "Putchar (%s);" (getStrExprTree value)
+    | Putchar(value)  -> Printf.sprintf "putchar (%s);" (getStrExprTree value)
+    | Return(value)  -> Printf.sprintf "return (%s);" (getStrExprTree value)
+    | Expr(value)  -> Printf.sprintf "execute (%s);" (getStrExprTree value)
     | Set(ident,value)  -> Printf.sprintf "var %s = %s;" (ident) (getStrExprTree value)
     | _           -> "undefined instr"
 ;

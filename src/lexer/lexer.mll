@@ -10,6 +10,7 @@ let ident = (alpha) (digit|alpha)*
 
 rule token = parse
   "putchar"       { PUTCHAR } 
+| "return"        { RETURN }
 | [' ' '\t''\n']  { token lexbuf }     (* skip blanks *)
 | intCst as lxm   { CST(int_of_string lxm) }
 | '='             { EQUAL }
