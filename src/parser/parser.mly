@@ -9,6 +9,9 @@
 
 
 %token PUTCHAR
+%token EQUAL
+
+%token <string> IDENT
 
 
 %token EOF
@@ -24,11 +27,12 @@ main:
     instr EOF                { $1 }
 ;
 instr:
-  PUTCHAR LPAREN expr RPAREN   { Putchar ($3) }
+  PUTCHAR LPAREN expr RPAREN      { Putchar ($3) }
+  | IDENT EQUAL expr              { Set ($1,$3) }
 expr:
-    CST                         { Cst ($1) }
-    | LPAREN expr RPAREN        { $2 }
-    | expr PLUS expr            { Add($1, $3) }
-    | expr TIMES expr           { Mul($1, $3) }
-    | expr LT expr              { Lt($1, $3) }
+  CST                           { Cst ($1) }
+  | LPAREN expr RPAREN          { $2 }
+  | expr PLUS expr              { Add($1, $3) }
+  | expr TIMES expr             { Mul($1, $3) }
+  | expr LT expr                { Lt($1, $3) }
 ;
