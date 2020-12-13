@@ -36,11 +36,52 @@ type prog = {
   functions: fun_def list;
 }
 
-let rec getStrExprTree exprTree=
+let rec getStrExprTree (exprTree : expr) : string=
     match exprTree with
       | Cst(x)    -> Printf.sprintf "Cst %i" x
       | Add(x,y)  -> Printf.sprintf "Add(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Mul(x,y)  -> Printf.sprintf "Mul(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Lt(x,y)   -> Printf.sprintf "Lt(%s, %s)"  (getStrExprTree x) (getStrExprTree y)
-      | _ -> Printf.sprintf "?"
-;
+      | _ -> "undefined expr"
+;;
+
+let nsprintf n character=
+  let rec nsprintf n acc=
+    match n with
+    | 0 -> acc
+    | x -> nsprintf (n-1) (Printf.sprintf "%s%c" acc character)
+  in
+  nsprintf n ""
+;;
+
+let getStrSeq (instrSeq : seq) : string=
+  let rec getStrSeq (instrSeq : seq) (acc: string) indent =
+    let indentStr = nsprintf indent ' ' in
+    match instrSeq with
+      |[]     -> Printf.sprintf "%s" acc
+      |hd::tl -> getStrSeq tl (Printf.sprintf "%s\n%s%s" acc indentStr (getStrInstr hd indent)) indent
+  and getStrInstr (instruction : instr) indent : string =
+    let indentStr = nsprintf indent ' ' in
+    match instruction with
+      | Putchar(value)  -> Printf.sprintf "putchar (%s);" (getStrExprTree value)
+      | Return(value)  -> Printf.sprintf "return (%s);" (getStrExprTree value)
+      | Expr(value)  -> Printf.sprintf "execute (%s);" (getStrExprTree value)
+      | Set(ident,value)  -> Printf.sprintf "var %s = %s;" (ident) (getStrExprTree value)
+      | If(e,b1,b2) ->
+      Printf.sprintf "\n%sif(%s){%s\n%s}else{%s\n%s}"
+        indentStr
+        (getStrExprTree e)
+        (getStrSeq b1 ""  (indent + 5))
+        indentStr
+        (getStrSeq b2 "" (indent + 5))
+        indentStr
+      | While(e,b1) ->
+        Printf.sprintf "while(%s){%s\n%s}"
+          (getStrExprTree e)
+          (getStrSeq b1 "" (indent + 5))
+          indentStr
+      | _           -> "undefined instr"
+  in
+  match instrSeq with
+    |[]     -> Printf.sprintf "EMPTY????"
+    |hd::tl -> getStrSeq tl (Printf.sprintf "%s" (getStrInstr hd 0)) 0
