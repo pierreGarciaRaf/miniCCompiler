@@ -5,7 +5,7 @@
 
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
-let intCst = '-'?['1'-'9']digit*
+let intCst = ('-'?['1'-'9']digit* | '-'?'0')
 let ident = (alpha) (digit|alpha)*
 
 rule token = parse
@@ -20,5 +20,10 @@ rule token = parse
 | '*'             { TIMES }
 | '('             { LPAREN }
 | ')'             { RPAREN }
+| '{'             { LACCOL }
+| '}'             { RACCOL }
+| "if"            { IF }
+| "else"          { ELSE }
+| "while"         { WHILE }
 | ident as lxm    { IDENT(lxm) }
 | eof             { EOF }

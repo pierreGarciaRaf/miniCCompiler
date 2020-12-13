@@ -1,4 +1,5 @@
-return 8;
-8+12;
-x = 595 * 35;
-putchar(5<8);
+5+9;
+while(1<3){
+    putchar(8);
+}
+return 0;
