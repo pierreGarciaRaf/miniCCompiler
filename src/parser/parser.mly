@@ -1,5 +1,7 @@
 %{
   open Mc
+  let parse_error str =
+    print_string str
 %}
 
 %token <int> CST
