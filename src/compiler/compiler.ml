@@ -15,11 +15,6 @@ let _ =
     character lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
   | SyntaxStringError charSeq -> Printf.printf "syntax error at string %s at line %i, column %i\n"
     charSeq   lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
-
+  | Parser.Error -> Printf.printf "semantic error at line %i, column %i\n"
+   lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
 ;;
-(* exception Zgeg
-let _ = 
-  try 
-    raise Zgeg
-  with Zgeg ->
-    print_string"\n\nzgeg";; *)
