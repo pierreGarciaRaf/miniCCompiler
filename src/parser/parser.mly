@@ -4,6 +4,8 @@
     print_string str
   let funcLocalTable = Hashtbl.create 4
   let funcParamsTable = Hashtbl.create 2
+  let globalVarTable = Hashtbl.create 3
+  let toDoublets key value acc= (key,value)::acc
 %}
 
 %token <int> CST
@@ -32,15 +34,30 @@
 %left TIMES
 
 %start main             /* the entry point */
-%type <Mc.fun_def> main
+%type <Mc.prog> main
 %%
 main:
-    func EOF                { $1 }
+    prog EOF                { $1 }
 ;
-func:(*let exempleCarte = {valeur = Nombre 5; couleur = Pique}
-*)
+prog:
+  funGlobalSeq                      {{globals = Hashtbl.fold toDoublets globalVarTable [];
+                                      functions = $1}}
+funGlobalSeq:
+  func funGlobalSeq                 {$1::$2}
+  | globalDecl funGlobalSeq         {$2}
+  | globalDecl                      {[]}
+  | func                            {[$1]}
+globalDecl:
+  | decl  SEMI                      { 
+                                      Hashtbl.add globalVarTable (fst $1) (snd $1);
+                                      Set (fst $1, Cst(0)) }
+  | decl EQUAL expr SEMI            { 
+                                      Hashtbl.add globalVarTable (fst $1) (snd $1);
+                                      Set (fst $1, $3)
+                                    }
 
-  decl LPAREN funcArg RPAREN acseq{ let toDoublets key value acc= (key,value)::acc in
+func:
+  decl LPAREN funcArg RPAREN acseq{
                                     let toReturn = {name = fst $1;
                                      params = $3;
                                      return = snd $1;

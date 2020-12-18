@@ -87,7 +87,7 @@ let getStrSeq (instrSeq : seq) : string=
   in
   match instrSeq with
     |[]     -> Printf.sprintf "EMPTY????"
-    |hd::tl -> getStrSeq tl (Printf.sprintf "%s" (getStrInstr hd 0)) 0
+    |hd::tl -> getStrSeq tl (Printf.sprintf "%s" (getStrInstr hd 1)) 1
 ;;
 
 let typeToStr typ=
@@ -107,8 +107,18 @@ let identListToStr params=
 ;;
 
 let func_to_str funDict = 
-  Printf.sprintf "locals = (%s)\n%s %s (%s){%s\n}"
+  Printf.sprintf "locals = (%s)\n%s %s (%s){\n%s\n}"
   (identListToStr funDict.locals)
   (typeToStr funDict.return) funDict.name (identListToStr funDict.params)
   (getStrSeq funDict.code)
+;;
+
+
+let prog_to_str prog = 
+  let func_to_str2 acc elt=
+    Printf.sprintf "%s\n\n%s\n" acc (func_to_str elt)
+  in
+  Printf.sprintf "globals:\n%s\nfunctions:\n%s\n"
+  (identListToStr prog.globals)
+  (List.fold_left func_to_str2 "" prog.functions)
 ;;

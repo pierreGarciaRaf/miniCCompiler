@@ -3,3 +3,10 @@ int main(void zoubida){
     bool y = 2;
     putchar(zoubida);
 }
+
+int l = 8;
+int k;
+void dsf(int s){
+    s;
+}
+
