@@ -6,7 +6,7 @@ int main(void zoubida){
 
 int l = 8;
 int k;
-void dsf(int s){
-    s;
+void dsf(){
+    5;
 }
 

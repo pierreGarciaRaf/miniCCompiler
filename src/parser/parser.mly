@@ -57,7 +57,7 @@ globalDecl:
                                     }
 
 func:
-  decl LPAREN funcArg RPAREN acseq{
+  decl LPAREN funcArgOpt RPAREN acseq{
                                     let toReturn = {name = fst $1;
                                      params = $3;
                                      return = snd $1;
@@ -68,6 +68,9 @@ func:
                                      Hashtbl.reset funcParamsTable;
                                      toReturn
                                   }
+funcArgOpt:
+  funcArg                         {$1}
+  |                               {[]}
 funcArg:
   decl COMMA funcArg              { Hashtbl.add funcParamsTable (fst $1) (snd $1);
                                     $1::$3 }
