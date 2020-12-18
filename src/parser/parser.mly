@@ -2,7 +2,6 @@
   open Mc
   let parse_error str =
     print_string str
-  exception Exception
 %}
 
 %token <int> CST
