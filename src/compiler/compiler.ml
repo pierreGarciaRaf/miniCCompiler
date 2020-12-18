@@ -7,7 +7,7 @@ let _ =
   try
     let result = Parser.main Lexer.token lexbuf in
     
-    print_string (getStrSeq result);
+    print_string (func_to_str result);
     print_string "\n";
     exit 0
   with 

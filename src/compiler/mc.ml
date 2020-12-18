@@ -16,14 +16,14 @@ type instr =
     | Expr    of expr
   and seq = instr list
   
-  
-  
+
+
 
 type typ =
     | Int
     | Bool
     | Void
-  
+
 type fun_def = {
     name:   string;
     params: (string * typ) list;
@@ -85,3 +85,27 @@ let getStrSeq (instrSeq : seq) : string=
   match instrSeq with
     |[]     -> Printf.sprintf "EMPTY????"
     |hd::tl -> getStrSeq tl (Printf.sprintf "%s" (getStrInstr hd 0)) 0
+;;
+
+let typeToStr typ=
+  match typ with
+  | Int -> "int"
+  | Bool -> "bool"
+  | Void -> "void"
+;;
+
+let identListToStr params=
+  let rec identListToStr params acc=
+    match params with
+      | [] -> acc
+      | hd::tl -> identListToStr tl (Printf.sprintf "%s,%s %s" acc (typeToStr (snd hd)) (fst hd))
+  in
+  identListToStr params ""
+;;
+
+let func_to_str funDict = 
+  Printf.sprintf "locals = (%s)\n%s %s (%s){%s\n}"
+  (identListToStr funDict.locals)
+  (typeToStr funDict.return) funDict.name (identListToStr funDict.params)
+  (getStrSeq funDict.code)
+;;

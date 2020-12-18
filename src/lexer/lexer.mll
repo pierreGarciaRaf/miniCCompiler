@@ -15,6 +15,7 @@ rule token = parse
   "putchar"       { PUTCHAR } 
 | "return"        { RETURN }
 | ';'             { SEMI }
+| ","             { COMMA }
 | [' ' '\t']      { token lexbuf }      (* skip blanks *)
 | '\n'            { Lexing.new_line lexbuf;    (*increment line count *)
                     token lexbuf }      (* skip new line *)
@@ -30,6 +31,9 @@ rule token = parse
 | "if"            { IF }
 | "else"          { ELSE }
 | "while"         { WHILE }
+| "int"           { INT }
+| "void"          { VOID }
+| "bool"          { BOOL }
 | ident as lxm    { IDENT(lxm) }
 | eof             { EOF }
 | noWord as lxm   { raise (SyntaxStringError lxm)}

@@ -1,9 +1,4 @@
-
-2+2;
-
-
-5++9 ;
-while(1<3){
-    putchar(8);
+int main(void zoubida){
+    int x = 8;
+    bool y = 2
 }
-return 0;
