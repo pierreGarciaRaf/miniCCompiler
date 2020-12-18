@@ -1,3 +1,5 @@
+exception VariableNotDefined of string
+
 type expr =
     | Cst  of int
     | Add  of expr * expr
@@ -42,6 +44,7 @@ let rec getStrExprTree (exprTree : expr) : string=
       | Add(x,y)  -> Printf.sprintf "Add(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Mul(x,y)  -> Printf.sprintf "Mul(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Lt(x,y)   -> Printf.sprintf "Lt(%s, %s)"  (getStrExprTree x) (getStrExprTree y)
+      | Get(x)    -> Printf.sprintf "Get(%s)" x
       | _ -> "undefined expr"
 ;;
 

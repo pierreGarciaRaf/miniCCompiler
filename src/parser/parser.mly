@@ -3,6 +3,7 @@
   let parse_error str =
     print_string str
   let funcLocalTable = Hashtbl.create 4
+  let funcParamsTable = Hashtbl.create 2
 %}
 
 %token <int> CST
@@ -47,11 +48,14 @@ func:(*let exempleCarte = {valeur = Nombre 5; couleur = Pique}
                                      code = $5
                                      } in
                                      Hashtbl.reset funcLocalTable;
+                                     Hashtbl.reset funcParamsTable;
                                      toReturn
                                   }
 funcArg:
-  decl COMMA funcArg              { $1::$3 }
-  | decl                          { [$1] }
+  decl COMMA funcArg              { Hashtbl.add funcParamsTable (fst $1) (snd $1);
+                                    $1::$3 }
+  | decl                          { Hashtbl.add funcParamsTable (fst $1) (snd $1);
+                                    [$1] }
 decl:
   typemc IDENT                      { ($2,$1) }
 typemc:
@@ -89,4 +93,15 @@ expr:
   | expr PLUS expr              { Add($1, $3) }
   | expr TIMES expr             { Mul($1, $3) }
   | expr LT expr                { Lt($1, $3) }
+  | IDENT                       { 
+                                  try 
+                                    let _ = Hashtbl.find funcLocalTable $1 in
+                                    Get($1)
+                                  with
+                                    Not_found -> 
+                                    try
+                                      let _ = Hashtbl.find funcParamsTable $1 in
+                                      Get($1)
+                                    with Not_found ->
+                                      raise (Mc.VariableNotDefined $1)}
 ;

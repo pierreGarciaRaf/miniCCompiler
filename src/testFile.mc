@@ -1,4 +1,5 @@
 int main(void zoubida){
     int x = 8;
-    bool y = 2
+    bool y = 2;
+    putchar(zoubida);
 }

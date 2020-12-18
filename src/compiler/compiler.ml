@@ -16,5 +16,7 @@ let _ =
   | SyntaxStringError charSeq -> Printf.printf "syntax error at string %s at line %i, column %i\n"
     charSeq   lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
   | Parser.Error -> Printf.printf "semantic error at line %i, column %i\n"
-   lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
+    lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
+  | Mc.VariableNotDefined varName -> Printf.printf "variable %s not defined at line %i, column %i\n"
+    varName lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
 ;;
