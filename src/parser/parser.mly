@@ -87,9 +87,12 @@ instr:
   | decl                          { 
                                     Hashtbl.add funcLocalTable (fst $1) (snd $1);
                                     Set (fst $1, Cst(0)) }
-  | decl EQUAL expr               { 
-                                    Hashtbl.add funcLocalTable (fst $1) (snd $1);
-                                    Set (fst $1, $3) }
+  | decl EQUAL expr               { match snd($1) with
+                                      |Bool -> if $3 == Cst(0) || $3 == Cst(1) 
+                                               then (Hashtbl.add funcLocalTable (fst $1) (snd $1); Set (fst $1, $3))
+                                               else raise (Mc.UnboundValue)
+                                      |_ -> Hashtbl.add funcLocalTable (fst $1) (snd $1); Set (fst $1, $3) 
+                                  }
 
   | IDENT EQUAL expr              { Set ($1,$3) }
   | RETURN expr                   { Return ($2) }

@@ -1,4 +1,6 @@
 exception VariableNotDefined of string
+exception UnboundValue
+
 
 type expr =
     | Cst  of int
@@ -7,7 +9,6 @@ type expr =
     | Lt   of expr * expr
     | Get  of string
     | Call of string * expr list
-
 
 type instr =
     | Putchar of expr

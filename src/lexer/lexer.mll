@@ -2,7 +2,6 @@
   open Parser
   exception SyntaxCharError of char
   exception SyntaxStringError of string
-
 }
 
 
