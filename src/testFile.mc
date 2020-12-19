@@ -1,12 +1,7 @@
-int main(void zoubida){
-    int x = 8;
-    bool y = 2;
-    putchar(zoubida);
+int a(){
+    b(2);
+    2;
 }
-
-int l = 8;
-int k;
-void dsf(){
-    5;
+int b(int z){
+    3;
 }
-

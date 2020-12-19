@@ -1,5 +1,4 @@
-exception VariableNotDefined of string
-exception UnboundValue
+
 
 
 type expr =
@@ -39,6 +38,10 @@ type prog = {
   functions: fun_def list;
 }
 
+exception UnexpectedValue of expr
+exception VariableNotDefined of string
+exception FunctionNotDefined of string
+
 let rec getStrExprTree (exprTree : expr) : string=
     match exprTree with
       | Cst(x)    -> Printf.sprintf "Cst %i" x
@@ -46,7 +49,11 @@ let rec getStrExprTree (exprTree : expr) : string=
       | Mul(x,y)  -> Printf.sprintf "Mul(%s, %s)" (getStrExprTree x) (getStrExprTree y)
       | Lt(x,y)   -> Printf.sprintf "Lt(%s, %s)"  (getStrExprTree x) (getStrExprTree y)
       | Get(x)    -> Printf.sprintf "Get(%s)" x
+      | Call(x,y) ->
+                     Printf.sprintf "%s(%s)" x (List.fold_left (paramsToStr) "" y )
       | _ -> "undefined expr"
+and paramsToStr (acc:string) (param : expr) : string =
+  Printf.sprintf "%s,%s" acc (getStrExprTree param)
 ;;
 
 let nsprintf n character=
