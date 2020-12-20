@@ -2,7 +2,9 @@ open Mc
 open Lexer
 
 let _ =
-  let ic = open_in "testFile.mc" in
+  let fileString = Array.get Sys.argv 1 in
+  print_string fileString;
+  let ic = open_in fileString in
   let lexbuf = Lexing.from_channel ic in
   try
     let result = Parser.main Lexer.token lexbuf in
