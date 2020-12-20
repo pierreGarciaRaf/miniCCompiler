@@ -1,4 +1,4 @@
-int a(){
+void a(){
     2;
 }
 int b(int z){
@@ -6,5 +6,5 @@ int b(int z){
     3;
 }
 void c(){
-    return b(a());
+    b(2);
 }

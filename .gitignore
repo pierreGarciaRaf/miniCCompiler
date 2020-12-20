@@ -6,3 +6,4 @@ test2/
 
 src/out/*
 !src/out/.gitkeep
+src/Mcc

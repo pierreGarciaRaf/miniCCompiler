@@ -36,35 +36,29 @@
                       | Void -> false
                       | Bool | Int -> true
 ;;
+    let raiseNoTranstipable typA typB=
+    if transtypagePossible typA typB then true else raise (UnvalidType (typB, typA))
+;;
   let rec exprType expr = 
+    Printf.printf "%s\n" (getStrExprTree expr);
     match expr with
       Cst x           -> Int
-      | Add (x, y)  -> if transtypagePossible (exprType x) Int then 
-                        if  transtypagePossible (exprType y) Int then
-                          Int
-                        else raise (UnexpectedValue y)
-                      else raise (UnexpectedValue x)
-      | Mul (x, y)  -> if transtypagePossible (exprType x) Int then 
-                        if  transtypagePossible (exprType y) Int then
-                          Int
-                        else raise (UnexpectedValue y)
-                      else raise (UnexpectedValue x)
-      | Lt (x, y)   -> if transtypagePossible (exprType x) Int then 
-                        if  transtypagePossible (exprType y) Int then
-                          Bool
-                        else raise (UnexpectedValue y)
-                      else raise (UnexpectedValue x)
+      | Add (x, y) | Mul (x, y) | Lt (x, y) 
+                    ->raiseNoTranstipable (exprType x) Int; 
+                      raiseNoTranstipable (exprType y) Int;
+                      Int
       | Get (name)  -> varTypeInEnvironment name
       | Call (funcName,givenArgs) ->
+      print_string "in call\n";
         try
           let func = Hashtbl.find funcTable funcName in
           let expected = func.params in
           try
-            if List.fold_left2 (
-              fun acc x y -> (snd x) = (exprType y) && acc)
-              true expected givenArgs then
-              func.return
-              else raise (UnexpectedValue (Call (funcName,givenArgs) ))
+            List.iter2
+            (fun x y -> (raiseNoTranstipable (snd y) (exprType x)); ())
+            givenArgs expected;
+            print_string "passed fold left2\n";
+            func.return
           with
             Invalid_argument x -> raise (UnvalidFunctionArgumentNb (List.length givenArgs,
                                                                     List.length expected,
@@ -106,7 +100,10 @@
 %type <Mc.prog> main
 %%
 main:
-    prog EOF                { $1 }
+    prog EOF                {
+                              try List.find (fun x-> x.name = "main") $1.functions; $1
+                              with Not_found -> raise NoMainFunction
+                            }
 ;
 prog:
   funGlobalSeq                      {{globals = Hashtbl.fold toDoublets globalVarTable [];
@@ -157,17 +154,20 @@ typemc:
   | BOOL                          { Bool }
   | VOID                          { Void }
 instr:
-  PUTCHAR parexpr                 { Putchar ($2) }
+  PUTCHAR parexpr                 { raiseNoTranstipable (exprType $2) Int;
+                                    Putchar ($2) }
   | decl                          { 
                                     Hashtbl.add funcLocalTable (fst $1) (snd $1);
-                                    Set (fst $1, Cst(0)) }
+                                    Set (fst $1, Cst(0))
+                                  }
   | decl EQUAL expr               { Hashtbl.add funcLocalTable (fst $1) (snd $1);
-                                    transtypagePossible (snd $1) (exprType $3);
+                                    raiseNoTranstipable (snd $1) (exprType $3);
                                     Set (fst $1, $3) }
-
-  | IDENT EQUAL expr              { transtypagePossible (varTypeInEnvironment $1) (exprType $3);
+  | IDENT EQUAL expr              {raiseNoTranstipable (varTypeInEnvironment $1) (exprType $3);
                                     Set ($1,$3) }
-  | RETURN expr                   { if transtypagePossible (exprType $2) !nowFunctionType then Return($2) else raise (UnvalidType (exprType $2,!nowFunctionType)) ;}
+  | RETURN expr                   { raiseNoTranstipable (exprType $2) !nowFunctionType;
+                                    Return($2)
+                                  }
   | expr                          { let _ = exprType $1 in
                                     Expr ($1) }
 
