@@ -23,4 +23,8 @@ let _ =
     (getStrExprTree expr) lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
   | Mc.FunctionNotDefined funcName -> Printf.printf "function %s not defined at line %i, column %i\n"
     funcName lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
+  | UnvalidFunctionArgumentNb (givenNumber,expectedNumber, funcName)-> Printf.printf "function %s awaits %i argument(s), gave %i at line %i, column %i\n"
+  funcName expectedNumber  givenNumber
+  lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
+
 ;;

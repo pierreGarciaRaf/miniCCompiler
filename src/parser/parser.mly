@@ -45,11 +45,19 @@
         try
           let func = Hashtbl.find funcTable funcName in
           let expected = func.params in
-          if List.fold_left2 (fun acc x y -> (snd x) = (exprType y) && acc) true expected givenArgs then
-            func.return
-            else raise (UnexpectedValue (Call (funcName,givenArgs) ))
+          try
+            if List.fold_left2 (
+              fun acc x y -> (snd x) = (exprType y) && acc)
+              true expected givenArgs then
+              func.return
+              else raise (UnexpectedValue (Call (funcName,givenArgs) ))
+          with
+            Invalid_argument x -> raise (UnvalidFunctionArgumentNb (List.length givenArgs,
+                                                                    List.length expected,
+                                                                    funcName))
         with
-          Not_found -> raise (FunctionNotDefined (Printf.sprintf "fname = %s, hshtbl = %s" funcName (Hashtbl.fold (fun key body acc -> Printf.sprintf"%s,%s" key acc) funcTable "")))
+          Not_found -> raise (FunctionNotDefined (Printf.sprintf "fname = %s, hshtbl = %s"
+            funcName (Hashtbl.fold (fun key body acc -> Printf.sprintf"%s,%s" key acc) funcTable "")))
   ;;
 %}
 

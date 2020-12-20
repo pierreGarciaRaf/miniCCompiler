@@ -41,7 +41,7 @@ type prog = {
 exception UnexpectedValue of expr
 exception VariableNotDefined of string
 exception FunctionNotDefined of string
-
+exception UnvalidFunctionArgumentNb of int * int * string
 let rec getStrExprTree (exprTree : expr) : string=
     match exprTree with
       | Cst(x)    -> Printf.sprintf "Cst %i" x
