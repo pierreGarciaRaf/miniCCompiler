@@ -3,7 +3,6 @@ open Lexer
 
 let _ =
   let fileString = Array.get Sys.argv 1 in
-  print_string fileString;
   let ic = open_in fileString in
   let lexbuf = Lexing.from_channel ic in
   try

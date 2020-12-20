@@ -18,7 +18,6 @@
   let toDoublets key value acc= (key,value)::acc
   let toFunctionList  key value acc = value::acc
   let varTypeInEnvironment varName =
-    Printf.printf "var type in environment for %s\n" varName;
     try
       Hashtbl.find funcLocalTable varName
     with Not_found ->
@@ -26,7 +25,6 @@
       Hashtbl.find funcParamsTable varName
     with Not_found ->
     try
-      Hashtbl.iter (fun x y -> Printf.printf "%s " (x)) globalVarTable;
       Hashtbl.find globalVarTable varName
     with Not_found ->
       raise (VariableNotDefined varName)
@@ -38,22 +36,22 @@
                       | Void -> false
                       | Bool | Int -> true
 ;;
-    let raiseNoTranstipable typA typB=
+    let raiseIfNotTranstypable typA typB=
     if transtypagePossible typA typB then true else raise (UnvalidType (typB, typA))
 ;;
   let rec exprType expr = 
     match expr with
       Cst x           -> Int
       | Add (x, y) | Mul (x, y) | Lt (x, y) 
-                    ->raiseNoTranstipable (exprType x) Int; 
-                      raiseNoTranstipable (exprType y) Int;
+                    ->raiseIfNotTranstypable (exprType x) Int; 
+                      raiseIfNotTranstypable (exprType y) Int;
                       Int
       | Get (name)  -> varTypeInEnvironment name
       | Call (funcName,givenArgs) ->
         if funcName = !nowFunctionName then (*Recursivity*)
           try
             List.iter2
-            (fun x y -> (raiseNoTranstipable (snd y) (exprType x)); ())
+            (fun x y -> (raiseIfNotTranstypable (snd y) (exprType x)); ())
             givenArgs !nowFunctionParam;
             !nowFunctionType
           with
@@ -66,7 +64,7 @@
             let expected = func.params in
             try
               List.iter2
-              (fun x y -> (raiseNoTranstipable (snd y) (exprType x)); ())
+              (fun x y -> (raiseIfNotTranstypable (snd y) (exprType x)); ())
               givenArgs expected;
               func.return
             with
@@ -74,8 +72,7 @@
                                                                     List.length expected,
                                                                     funcName))
         with
-          Not_found -> raise (FunctionNotDefined (Printf.sprintf "fname = %s, hshtbl = %s"
-            funcName (Hashtbl.fold (fun key body acc -> Printf.sprintf"%s,%s" key acc) funcTable "")))
+          Not_found -> raise (FunctionNotDefined funcName)
   ;;
 %}
 
@@ -123,17 +120,14 @@ funGlobalSeq:
   | funcOGlobal                           { () }
 funcOGlobal:
   globalDecl                        { () }
-  | func                            { Printf.printf "%s added to HshTbl\n" $1.name;
-                                      Hashtbl.add funcTable $1.name $1 }
+  | func                            { Hashtbl.add funcTable $1.name $1 }
 globalDecl:
   | decl  SEMI                      { 
                                       Hashtbl.add globalVarTable (fst $1) (snd $1);
-                                      Printf.printf "\n%s %s added to globals\n" (typeToStr (snd $1)) (fst $1);
                                       Set (fst $1, Cst(0))
                                     }
   | decl EQUAL expr SEMI            { 
                                       Hashtbl.add globalVarTable (fst $1) (snd $1);
-                                      Printf.printf "\n%s %s added to globals\n" (typeToStr (snd $1)) (fst $1);
                                       Set (fst $1, $3)
                                     }
 func:
@@ -166,7 +160,7 @@ typemc:
   | BOOL                          { Bool }
   | VOID                          { Void }
 instr:
-  PUTCHAR parexpr                 { raiseNoTranstipable (exprType $2) Int;
+  PUTCHAR parexpr                 { raiseIfNotTranstypable (exprType $2) Int;
                                     Putchar ($2) }
   | decl                          { 
                                     Hashtbl.add funcLocalTable (fst $1) (snd $1);
@@ -174,11 +168,11 @@ instr:
                                   } 
                                   
   | decl EQUAL expr               { Hashtbl.add funcLocalTable (fst $1) (snd $1);
-                                    raiseNoTranstipable (snd $1) (exprType $3);
+                                    raiseIfNotTranstypable (snd $1) (exprType $3);
                                     Set (fst $1, $3) }
-  | IDENT EQUAL expr              {raiseNoTranstipable (varTypeInEnvironment $1) (exprType $3);
+  | IDENT EQUAL expr              {raiseIfNotTranstypable (varTypeInEnvironment $1) (exprType $3);
                                     Set ($1,$3) }
-  | RETURN expr                   { raiseNoTranstipable (exprType $2) !nowFunctionType;
+  | RETURN expr                   { raiseIfNotTranstypable (exprType $2) !nowFunctionType;
                                     Return($2)
                                   }
   | expr                          { let _ = exprType $1 in
@@ -191,8 +185,10 @@ paramList:
   expr                            { [$1] }
   | expr COMMA paramList          { $1 :: $3}
 branch:
-  IF parexpr acseq ELSE acseq     { If($2, $3, $5) }
-  | WHILE parexpr acseq           { While($2, $3) }
+  IF parexpr acseq ELSE acseq     { raiseIfNotTranstypable (exprType $2) Bool;
+                                    If($2, $3, $5)}
+  | WHILE parexpr acseq           { raiseIfNotTranstypable (exprType $2) Bool;
+                                    While($2, $3) }
 acseq:
   LACCOL seq RACCOL               { $2 }
 lineCommand:
