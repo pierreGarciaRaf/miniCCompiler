@@ -5,8 +5,6 @@ int b(int z, int t){
     a();
     3;
 }
-void c(){
-    b(2,3);
-    b(2+3,0);
+void main(){
     return b(a(),2);
 }
