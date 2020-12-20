@@ -40,7 +40,6 @@
     if transtypagePossible typA typB then true else raise (UnvalidType (typB, typA))
 ;;
   let rec exprType expr = 
-    Printf.printf "%s\n" (getStrExprTree expr);
     match expr with
       Cst x           -> Int
       | Add (x, y) | Mul (x, y) | Lt (x, y) 
@@ -49,7 +48,6 @@
                       Int
       | Get (name)  -> varTypeInEnvironment name
       | Call (funcName,givenArgs) ->
-      print_string "in call\n";
         try
           let func = Hashtbl.find funcTable funcName in
           let expected = func.params in
@@ -57,7 +55,6 @@
             List.iter2
             (fun x y -> (raiseNoTranstipable (snd y) (exprType x)); ())
             givenArgs expected;
-            print_string "passed fold left2\n";
             func.return
           with
             Invalid_argument x -> raise (UnvalidFunctionArgumentNb (List.length givenArgs,
