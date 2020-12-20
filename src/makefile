@@ -8,7 +8,7 @@ make:
     
 	cd out/; \
 	ocamllex lexer.mll; \
-	menhir parser.mly; \
+	menhir --explain parser.mly; \
 	ocamlc -c mc.ml; \
 	ocamlc -c parser.mli; \
 	ocamlc -c lexer.ml; \

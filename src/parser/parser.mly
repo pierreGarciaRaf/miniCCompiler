@@ -59,7 +59,6 @@
 %token LPAREN RPAREN
 %token <string> IDENT
 
-%token CALL
 %token PUTCHAR
 %token EQUAL
 %token RETURN
@@ -74,9 +73,9 @@
 %token INT VOID BOOL
 
 %token EOF
-%token FUNCDEF
+%token FUNGLOBALCONCAT
 
-%nonassoc FUNCDEF
+
 %left LT
 %left PLUS
 %left TIMES
@@ -91,20 +90,23 @@ prog:
   funGlobalSeq                      {{globals = Hashtbl.fold toDoublets globalVarTable [];
                                       functions = Hashtbl.fold toFunctionList funcTable []}}
 funGlobalSeq:
-  func funGlobalSeq                 { Printf.printf "%s added to HshTbl\n" $1.name; Hashtbl.add funcTable $1.name $1 } %prec FUNCDEF
-  | globalDecl funGlobalSeq         { () }
-  | globalDecl                      { () }
-  | func                            { Printf.printf "%s added to HshTbl\n" $1.name; Hashtbl.add funcTable $1.name $1} %prec FUNCDEF
+  funcOGlobal funGlobalSeq                { () }
+  | funcOGlobal                           { () }
+funcOGlobal:
+  globalDecl                        { () }
+  | func                            { Printf.printf "%s added to HshTbl\n" $1.name;
+                                      Hashtbl.add funcTable $1.name $1 }
 globalDecl:
   | decl  SEMI                      { 
                                       Hashtbl.add globalVarTable (fst $1) (snd $1);
-                                      Set (fst $1, Cst(0)) }
+                                      Set (fst $1, Cst(0))
+                                    }
   | decl EQUAL expr SEMI            { 
                                       Hashtbl.add globalVarTable (fst $1) (snd $1);
                                       Set (fst $1, $3)
                                     }
 func:
-  decl LPAREN funcArgOpt RPAREN acseq{
+  decl LPAREN funcArgOpt RPAREN acseq{ 
                                     let toReturn = {name = fst $1;
                                      params = $3;
                                      return = snd $1;
