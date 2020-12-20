@@ -124,7 +124,7 @@ let func_to_str funDict =
 
 let prog_to_str prog = 
   let func_to_str2 acc elt=
-    Printf.sprintf "%s\n\n%s\n" acc (func_to_str elt)
+    Printf.sprintf "%s\n\n%s\n" (func_to_str elt) acc
   in
   Printf.sprintf "globals:\n%s\nfunctions:\n%s\n"
   (identListToStr prog.globals)
