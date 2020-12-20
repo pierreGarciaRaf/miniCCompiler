@@ -1,12 +1,20 @@
 %{
   open Mc
-  let parse_error str =
-    print_string str
   let funcLocalTable  = Hashtbl.create 4
   let funcParamsTable = Hashtbl.create 2
   let globalVarTable  = Hashtbl.create 3
   let funcTable       = Hashtbl.create 6
 
+  let nowFunctionName  = ref "noName"
+  let nowFunctionType  = ref Void
+  let nowFunctionParam = ref []
+
+  let setFuncParamReturn name returnType params=
+    nowFunctionName  := name;
+    nowFunctionType  := returnType;
+    nowFunctionParam := params;
+    ()
+  ;;
   let toDoublets key value acc= (key,value)::acc
   let toFunctionList  key value acc = value::acc
   let varTypeInEnvironment varName =
@@ -23,11 +31,10 @@
   ;;
   let transtypagePossible typA typB=
     match typA with
-      | Void -> false
+      | Void -> typB = Void
       | Bool| Int -> match typB with 
                       | Void -> false
-                      | Bool -> true
-                      | Int  -> true
+                      | Bool | Int -> true
 ;;
   let rec exprType expr = 
     match expr with
@@ -121,17 +128,20 @@ globalDecl:
                                       Set (fst $1, $3)
                                     }
 func:
-  decl LPAREN funcArgOpt RPAREN acseq{ 
-                                    let toReturn = {name = fst $1;
-                                     params = $3;
-                                     return = snd $1;
-                                     locals = Hashtbl.fold toDoublets funcLocalTable [];
-                                     code = $5
-                                     } in
-                                     Hashtbl.reset funcLocalTable;
-                                     Hashtbl.reset funcParamsTable;
-                                     toReturn
-                                  }
+  funcFirstPart acseq {
+                          let toReturn = {
+                                    name    = !nowFunctionName;
+                                    params  = !nowFunctionParam;
+                                    return  = !nowFunctionType;
+                                    locals  = Hashtbl.fold toDoublets funcLocalTable [];
+                                    code    = $2
+                                    } in
+                                    Hashtbl.reset funcLocalTable;
+                                    Hashtbl.reset funcParamsTable;
+                                    toReturn
+  }
+funcFirstPart:
+  decl LPAREN funcArgOpt RPAREN{ setFuncParamReturn (fst $1) (snd $1) $3; () }
 funcArgOpt:
   funcArg                         {$1}
   |                               {[]}
@@ -152,11 +162,14 @@ instr:
                                     Hashtbl.add funcLocalTable (fst $1) (snd $1);
                                     Set (fst $1, Cst(0)) }
   | decl EQUAL expr               { Hashtbl.add funcLocalTable (fst $1) (snd $1);
+                                    transtypagePossible (snd $1) (exprType $3);
                                     Set (fst $1, $3) }
 
-  | IDENT EQUAL expr              { Set ($1,$3) }
-  | RETURN expr                   { Return ($2) }
-  | expr                          { Expr ($1) }
+  | IDENT EQUAL expr              { transtypagePossible (varTypeInEnvironment $1) (exprType $3);
+                                    Set ($1,$3) }
+  | RETURN expr                   { if transtypagePossible (exprType $2) !nowFunctionType then () else raise ;}
+  | expr                          { let _ = exprType $1 in
+                                    Expr ($1) }
 
 paramListopt:
   LPAREN paramList RPAREN         { $2 }
