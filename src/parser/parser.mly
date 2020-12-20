@@ -18,6 +18,7 @@
   let toDoublets key value acc= (key,value)::acc
   let toFunctionList  key value acc = value::acc
   let varTypeInEnvironment varName =
+    Printf.printf "var type in environment for %s\n" varName;
     try
       Hashtbl.find funcLocalTable varName
     with Not_found ->
@@ -25,6 +26,7 @@
       Hashtbl.find funcParamsTable varName
     with Not_found ->
     try
+      Hashtbl.iter (fun x y -> Printf.printf "%s " (x)) globalVarTable;
       Hashtbl.find globalVarTable varName
     with Not_found ->
       raise (VariableNotDefined varName)
@@ -48,16 +50,27 @@
                       Int
       | Get (name)  -> varTypeInEnvironment name
       | Call (funcName,givenArgs) ->
-        try
-          let func = Hashtbl.find funcTable funcName in
-          let expected = func.params in
+        if funcName = !nowFunctionName then (*Recursivity*)
           try
             List.iter2
             (fun x y -> (raiseNoTranstipable (snd y) (exprType x)); ())
-            givenArgs expected;
-            func.return
+            givenArgs !nowFunctionParam;
+            !nowFunctionType
           with
             Invalid_argument x -> raise (UnvalidFunctionArgumentNb (List.length givenArgs,
+                                                                    List.length !nowFunctionParam,
+                                                                    funcName))
+        else
+          try (*pre-defined function call*)
+            let func = Hashtbl.find funcTable funcName in
+            let expected = func.params in
+            try
+              List.iter2
+              (fun x y -> (raiseNoTranstipable (snd y) (exprType x)); ())
+              givenArgs expected;
+              func.return
+            with
+              Invalid_argument x -> raise (UnvalidFunctionArgumentNb (List.length givenArgs,
                                                                     List.length expected,
                                                                     funcName))
         with
@@ -115,10 +128,12 @@ funcOGlobal:
 globalDecl:
   | decl  SEMI                      { 
                                       Hashtbl.add globalVarTable (fst $1) (snd $1);
+                                      Printf.printf "\n%s %s added to globals\n" (typeToStr (snd $1)) (fst $1);
                                       Set (fst $1, Cst(0))
                                     }
   | decl EQUAL expr SEMI            { 
                                       Hashtbl.add globalVarTable (fst $1) (snd $1);
+                                      Printf.printf "\n%s %s added to globals\n" (typeToStr (snd $1)) (fst $1);
                                       Set (fst $1, $3)
                                     }
 func:
@@ -156,7 +171,8 @@ instr:
   | decl                          { 
                                     Hashtbl.add funcLocalTable (fst $1) (snd $1);
                                     Set (fst $1, Cst(0))
-                                  }
+                                  } 
+                                  
   | decl EQUAL expr               { Hashtbl.add funcLocalTable (fst $1) (snd $1);
                                     raiseNoTranstipable (snd $1) (exprType $3);
                                     Set (fst $1, $3) }
@@ -193,17 +209,7 @@ expr:
   | expr PLUS expr              { Add($1, $3) }
   | expr TIMES expr             { Mul($1, $3) }
   | expr LT expr                { Lt($1, $3) }
-  | IDENT                       { 
-                                  try 
-                                    let _ = Hashtbl.find funcLocalTable $1 in
-                                    Get($1)
-                                  with
-                                    Not_found -> 
-                                    try
-                                      let _ = Hashtbl.find funcParamsTable $1 in
-                                      Get($1)
-                                    with Not_found ->
-                                      raise (Mc.VariableNotDefined $1)}
+  | IDENT                       { varTypeInEnvironment $1; Get($1) }
   | IDENT paramListopt            { 
                                     let _ = exprType (Call ( $1, $2)) in
                                     Call ( $1, $2)
