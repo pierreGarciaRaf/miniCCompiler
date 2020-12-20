@@ -167,7 +167,7 @@ instr:
 
   | IDENT EQUAL expr              { transtypagePossible (varTypeInEnvironment $1) (exprType $3);
                                     Set ($1,$3) }
-  | RETURN expr                   { if transtypagePossible (exprType $2) !nowFunctionType then () else raise ;}
+  | RETURN expr                   { if transtypagePossible (exprType $2) !nowFunctionType then Return($2) else raise (UnvalidType (exprType $2,!nowFunctionType)) ;}
   | expr                          { let _ = exprType $1 in
                                     Expr ($1) }
 

@@ -26,5 +26,6 @@ let _ =
   | UnvalidFunctionArgumentNb (givenNumber,expectedNumber, funcName)-> Printf.printf "function %s awaits %i argument(s), gave %i at line %i, column %i\n"
   funcName expectedNumber  givenNumber
   lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
-
+  | UnvalidType (typ1, typ2) -> Printf.printf "unexpectedType %s at line %i, column %i, type %s was expected\n"
+  (typeToStr typ1) lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol) (typeToStr typ2)
 ;;

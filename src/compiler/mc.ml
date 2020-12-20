@@ -42,6 +42,7 @@ exception UnexpectedValue of expr
 exception VariableNotDefined of string
 exception FunctionNotDefined of string
 exception UnvalidFunctionArgumentNb of int * int * string
+exception UnvalidType of typ * typ
 let rec getStrExprTree (exprTree : expr) : string=
     match exprTree with
       | Cst(x)    -> Printf.sprintf "Cst %i" x
@@ -129,4 +130,11 @@ let prog_to_str prog =
   Printf.sprintf "globals:\n%s\nfunctions:\n%s\n"
   (identListToStr prog.globals)
   (List.fold_left func_to_str2 "" prog.functions)
+;;
+
+let typToString typ =
+  match typ with
+  | Int  -> "Int"
+  | Bool -> "Bool"
+  | Void -> "Void"
 ;;
