@@ -21,22 +21,29 @@
     with Not_found ->
       raise (VariableNotDefined varName)
   ;;
-
+  let transtypagePossible typA typB=
+    match typA with
+      | Void -> false
+      | Bool| Int -> match typB with 
+                      | Void -> false
+                      | Bool -> true
+                      | Int  -> true
+;;
   let rec exprType expr = 
     match expr with
       Cst x           -> Int
-      | Add (x, y)  -> if exprType x = Int then 
-                        if  exprType y = Int then
+      | Add (x, y)  -> if transtypagePossible (exprType x) Int then 
+                        if  transtypagePossible (exprType y) Int then
                           Int
                         else raise (UnexpectedValue y)
                       else raise (UnexpectedValue x)
-      | Mul (x, y)  -> if exprType x = Int then 
-                        if  exprType y = Int then
+      | Mul (x, y)  -> if transtypagePossible (exprType x) Int then 
+                        if  transtypagePossible (exprType y) Int then
                           Int
                         else raise (UnexpectedValue y)
                       else raise (UnexpectedValue x)
-      | Lt (x, y)   -> if exprType x = Int then 
-                        if  exprType y = Int then
+      | Lt (x, y)   -> if transtypagePossible (exprType x) Int then 
+                        if  transtypagePossible (exprType y) Int then
                           Bool
                         else raise (UnexpectedValue y)
                       else raise (UnexpectedValue x)
