@@ -91,6 +91,7 @@
 
 %token IF ELSE
 %token WHILE
+%token FOR
 %token LACCOL RACCOL
 
 %token INT VOID BOOL
@@ -189,10 +190,20 @@ branch:
                                     If($2, $3, $5)}
   | WHILE parexpr acseq           { raiseIfNotTranstypable (exprType $2) Bool;
                                     While($2, $3) }
+  | FOR LPAREN instrOpt SEMI exprOpt SEMI  instrOpt RPAREN acseq
+                                  { raiseIfNotTranstypable (exprType $5) Bool;
+                                    For($3,$5,$7,$9) }
+instrOpt:
+  instr       { $1 }
+  | {Empty}
+exprOpt:
+  expr       { $1 }
+  | {Cst(1)}
 acseq:
   LACCOL seq RACCOL               { $2 }
 lineCommand:
   |instr SEMI                     { $1 }
+  |SEMI                           { Empty }
   |branch                         { $1 }
 seq :
   lineCommand seq                    { $1::$2 }

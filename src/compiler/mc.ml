@@ -14,8 +14,10 @@ type instr =
     | Set     of string * expr
     | If      of expr * seq * seq
     | While   of expr * seq
+    | For     of instr * expr * instr * seq
     | Return  of expr
     | Expr    of expr
+    | Empty
   and seq = instr list
   
 
@@ -80,24 +82,29 @@ let getStrSeq (instrSeq : seq) : string=
       | Return(value)  -> Printf.sprintf "return (%s);" (getStrExprTree value)
       | Expr(value)  -> Printf.sprintf "execute (%s);" (getStrExprTree value)
       | Set(ident,value)  -> Printf.sprintf "var %s = %s;" (ident) (getStrExprTree value)
+      | Empty -> ";"
       | If(e,b1,b2) ->
-      Printf.sprintf "\n%sif(%s){%s\n%s}else{%s\n%s}"
-        indentStr
+      Printf.sprintf "if(%s){%s\n%s}else{%s\n%s}"
         (getStrExprTree e)
-        (getStrSeq b1 ""  (indent + 5))
+        (getStrSeq b1 ""  (indent + 3))
         indentStr
-        (getStrSeq b2 "" (indent + 5))
+        (getStrSeq b2 "" (indent + 3))
         indentStr
       | While(e,b1) ->
         Printf.sprintf "while(%s){%s\n%s}"
           (getStrExprTree e)
-          (getStrSeq b1 "" (indent + 5))
+          (getStrSeq b1 "" (indent + 3))
+          indentStr
+      | For(fstInstr, verifier, incrementation, seqBlock) ->
+        Printf.sprintf "for(%s; %s; %s){%s\n%s}"
+          (getStrInstr fstInstr 0)
+          (getStrExprTree verifier)
+          (getStrInstr incrementation 0)
+          (getStrSeq seqBlock "" (indent + 3))
           indentStr
       | _           -> "undefined instr"
   in
-  match instrSeq with
-    |[]     -> Printf.sprintf "EMPTY????"
-    |hd::tl -> getStrSeq tl (Printf.sprintf "%s" (getStrInstr hd 1)) 1
+  getStrSeq instrSeq "" 3
 ;;
 
 let typeToStr typ=
@@ -117,10 +124,10 @@ let identListToStr params=
 ;;
 
 let func_to_str funDict = 
-  Printf.sprintf "locals = (%s)\n%s %s (%s){\n%s\n}"
+  Printf.sprintf "locals = (%s)\n%s %s (%s){\n%s%s\n}"
   (identListToStr funDict.locals)
   (typeToStr funDict.return) funDict.name (identListToStr funDict.params)
-  (getStrSeq funDict.code)
+  "" (getStrSeq funDict.code)
 ;;
 
 
