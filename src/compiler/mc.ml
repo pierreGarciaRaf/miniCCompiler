@@ -47,6 +47,9 @@ exception VariableMispelled  of string * string
 exception FunctionNotDefined of string
 exception FunctionMispelled  of string * string
 
+exception MissingLAcc
+exception MissingRAcc
+
 exception UnvalidFunctionArgumentNb of int * int * string
 exception UnvalidType of typ * typ
 exception NoMainFunction

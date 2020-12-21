@@ -135,12 +135,13 @@
 %token INT VOID BOOL
 
 %token EOF
-%token FUNGLOBALCONCAT
 
 
 %left LT
 %left PLUS
 %left TIMES
+
+%on_error_reduce lineCommand
 
 %start main             /* the entry point */
 %type <Mc.prog> main
@@ -244,9 +245,7 @@ lineCommand:
   |instr SEMI                     { $1 }
   |SEMI                           { Empty }
   |branch                         { $1 }
-  |fakeLineCommand                {raise MissingSemi}
-fakeLineCommand:
-  |instr                          { }
+(*  |fakeLineCommand                {raise MissingSemi} %prec FALSE_COMMAND *)
 seq :
   lineCommand seq                    { $1::$2 }
   | lineCommand                      { [$1] }

@@ -47,4 +47,11 @@ let _ =
   lexbuf.lex_start_p.pos_lnum (lexbuf.lex_start_p.pos_cnum - lexbuf.lex_start_p.pos_bol)
   
   | NoMainFunction -> Printf.printf "No main function defined\n"
+
+  | MissingLAcc -> Printf.printf "Missing '{' at line %i, column %i\n"
+  lexbuf.lex_start_p.pos_lnum (lexbuf.lex_start_p.pos_cnum - lexbuf.lex_start_p.pos_bol)
+
+  | MissingRAcc -> Printf.printf "Missing '}' at line %i, column %i\n"
+  lexbuf.lex_start_p.pos_lnum (lexbuf.lex_start_p.pos_cnum - lexbuf.lex_start_p.pos_bol)
+  
 ;;
