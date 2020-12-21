@@ -225,12 +225,12 @@ paramList:
   expr                            { [$1] }
   | expr COMMA paramList          { $1 :: $3}
 branch:
-  IF parexpr acseq ELSE acseq     { raiseIfNotTranstypable (exprType $2) Bool;
+  IF parexpr acseq ELSE acseq     { raiseIfNotTranstypable Bool (exprType $2);
                                     If($2, $3, $5)}
-  | WHILE parexpr acseq           { raiseIfNotTranstypable (exprType $2) Bool;
+  | WHILE parexpr acseq           { raiseIfNotTranstypable Bool (exprType $2);
                                     While($2, $3) }
   | FOR LPAREN instrOpt SEMI exprOpt SEMI  instrOpt RPAREN acseq
-                                  { raiseIfNotTranstypable (exprType $5) Bool;
+                                  { raiseIfNotTranstypable Bool (exprType $5);
                                     For($3,$5,$7,$9) }
 instrOpt:
   instr       { $1 }
