@@ -22,6 +22,6 @@ int forFact(int n){
 void emptyFunction(){}
 
 void main() {
-    putchar(fact(PARAM));
+    putchar(facto(PARAM));
     putchar(forFact(PARAM));
 }

@@ -24,11 +24,17 @@ let _ =
   | Mc.VariableNotDefined varName -> Printf.printf "variable %s not defined at line %i, column %i\n"
     varName lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
 
+  | Mc.VariableMispelled (varName, missedVarName)-> Printf.printf "variable %s not defined at line %i, column %i\n\tdid you mean %s?\n"
+    varName lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol) missedVarName
+
   | Mc.UnexpectedValue expr-> Printf.printf "unexpected value %s at line %i, column %i\n"
     (getStrExprTree expr) lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
 
   | Mc.FunctionNotDefined funcName -> Printf.printf "function %s not defined at line %i, column %i\n"
     funcName lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol)
+
+  | Mc.FunctionMispelled (funcName, missedVarName) -> Printf.printf "function %s not defined at line %i, column %i\n\tdid you mean %s?\n"
+  funcName lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol) missedVarName
 
   | UnvalidFunctionArgumentNb (givenNumber,expectedNumber, funcName)-> Printf.printf "function %s awaits %i argument(s), gave %i at line %i, column %i\n"
   funcName expectedNumber  givenNumber

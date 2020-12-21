@@ -1,4 +1,4 @@
-
+open Spelll
 
 
 type expr =
@@ -42,7 +42,11 @@ type prog = {
 
 exception UnexpectedValue of expr
 exception VariableNotDefined of string
+exception VariableMispelled  of string * string
+
 exception FunctionNotDefined of string
+exception FunctionMispelled  of string * string
+
 exception UnvalidFunctionArgumentNb of int * int * string
 exception UnvalidType of typ * typ
 exception NoMainFunction
