@@ -42,19 +42,19 @@
       let dfa = Spelll.of_string ~limit:2 varName in
       let (found, mispelledVarName) = Hashtbl.fold (compareStrOnHshTblForFold dfa) funcLocalTable (false, "") in
       if found then
-        raise (FunctionMispelled (varName, mispelledVarName))
+        raise (VariableMispelled (varName, mispelledVarName))
 
 
       else
         let (found2, mispelledVarName2) = Hashtbl.fold (compareStrOnHshTblForFold dfa) funcParamsTable (false, "") in
         if found2 then
-          raise (FunctionMispelled (varName, mispelledVarName2))
+          raise (VariableMispelled (varName, mispelledVarName2))
 
 
         else
           let (found3, mispelledVarName3) = Hashtbl.fold (compareStrOnHshTblForFold dfa) globalVarTable (false, "") in
           if found3 then
-            raise (FunctionMispelled (varName, mispelledVarName3))
+            raise (VariableMispelled (varName, mispelledVarName3))
 
 
           else
