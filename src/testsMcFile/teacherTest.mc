@@ -19,6 +19,8 @@ int forFact(int n){
     return prod;
 }
 
+void emptyFunction(){}
+
 void main() {
     putchar(fact(PARAM));
     putchar(forFact(PARAM));

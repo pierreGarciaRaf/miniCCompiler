@@ -96,7 +96,7 @@ let getStrSeq (instrSeq : seq) : string=
           (getStrSeq b1 "" (indent + 3))
           indentStr
       | For(fstInstr, verifier, incrementation, seqBlock) ->
-        Printf.sprintf "for(%s; %s; %s){%s\n%s}"
+        Printf.sprintf "for(%s %s %s){%s\n%s}"
           (getStrInstr fstInstr 0)
           (getStrExprTree verifier)
           (getStrInstr incrementation 0)

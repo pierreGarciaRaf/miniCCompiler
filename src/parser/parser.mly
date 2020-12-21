@@ -201,6 +201,7 @@ exprOpt:
   | {Cst(1)}
 acseq:
   LACCOL seq RACCOL               { $2 }
+  | LACCOL RACCOL                 { [] }
 lineCommand:
   |instr SEMI                     { $1 }
   |SEMI                           { Empty }
