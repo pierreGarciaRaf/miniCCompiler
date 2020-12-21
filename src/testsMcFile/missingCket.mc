@@ -14,7 +14,7 @@ int forFact(int n){
     for (; i < n + 1; i = i + 1){
         prod = i * prod;
         putchar(prod);
-    }
+    
     putchar(prod);
     return prod;
 }

@@ -1,4 +1,6 @@
+
 %{
+
   open Mc
   let funcLocalTable  = Hashtbl.create 4
   let funcParamsTable = Hashtbl.create 2
@@ -15,6 +17,16 @@
     nowFunctionParam := params;
     ()
   ;;
+  let compareStrOnHshTblForFold dfa = 
+  fun key value acc ->
+    if (fst acc) then
+      acc
+    else
+      if (Spelll.match_with dfa key) then
+        (true,key)
+      else (false,"")
+;;
+
   let toDoublets key value acc= (key,value)::acc
   let toFunctionList  key value acc = value::acc
   let varTypeInEnvironment varName =
@@ -27,7 +39,26 @@
     try
       Hashtbl.find globalVarTable varName
     with Not_found ->
-      raise (VariableNotDefined varName)
+      let dfa = Spelll.of_string ~limit:2 varName in
+      let (found, mispelledVarName) = Hashtbl.fold (compareStrOnHshTblForFold dfa) funcLocalTable (false, "") in
+      if found then
+        raise (VariableMispelled (varName, mispelledVarName))
+
+
+      else
+        let (found2, mispelledVarName2) = Hashtbl.fold (compareStrOnHshTblForFold dfa) funcParamsTable (false, "") in
+        if found2 then
+          raise (VariableMispelled (varName, mispelledVarName2))
+
+
+        else
+          let (found3, mispelledVarName3) = Hashtbl.fold (compareStrOnHshTblForFold dfa) globalVarTable (false, "") in
+          if found3 then
+            raise (VariableMispelled (varName, mispelledVarName3))
+
+
+          else
+            raise (VariableNotDefined varName)
   ;;
   let transtypagePossible typA typB=
     match typA with
@@ -72,7 +103,14 @@
                                                                     List.length expected,
                                                                     funcName))
         with
-          Not_found -> raise (FunctionNotDefined funcName)
+          
+          Not_found -> 
+            let dfa = Spelll.of_string ~limit:2 funcName in
+            let (found, mispelledFuncName) = Hashtbl.fold (compareStrOnHshTblForFold dfa) funcTable (false, "") in
+            if found then
+              raise (FunctionMispelled (funcName, mispelledFuncName))
+            else
+              raise (FunctionNotDefined funcName)
   ;;
 %}
 
@@ -91,17 +129,19 @@
 
 %token IF ELSE
 %token WHILE
+%token FOR
 %token LACCOL RACCOL
 
 %token INT VOID BOOL
 
 %token EOF
-%token FUNGLOBALCONCAT
 
 
 %left LT
 %left PLUS
 %left TIMES
+
+%on_error_reduce lineCommand
 
 %start main             /* the entry point */
 %type <Mc.prog> main
@@ -189,11 +229,23 @@ branch:
                                     If($2, $3, $5)}
   | WHILE parexpr acseq           { raiseIfNotTranstypable (exprType $2) Bool;
                                     While($2, $3) }
+  | FOR LPAREN instrOpt SEMI exprOpt SEMI  instrOpt RPAREN acseq
+                                  { raiseIfNotTranstypable (exprType $5) Bool;
+                                    For($3,$5,$7,$9) }
+instrOpt:
+  instr       { $1 }
+  | {Empty}
+exprOpt:
+  expr       { $1 }
+  | {Cst(1)}
 acseq:
   LACCOL seq RACCOL               { $2 }
+  | LACCOL RACCOL                 { [] }
 lineCommand:
   |instr SEMI                     { $1 }
+  |SEMI                           { Empty }
   |branch                         { $1 }
+(*  |fakeLineCommand                {raise MissingSemi} %prec FALSE_COMMAND *)
 seq :
   lineCommand seq                    { $1::$2 }
   | lineCommand                      { [$1] }

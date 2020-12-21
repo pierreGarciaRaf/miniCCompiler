@@ -9,12 +9,18 @@ make:
 	cd out/; \
 	ocamllex lexer.mll; \
 	menhir --explain parser.mly; \
-	ocamlc -c mc.ml; \
-	ocamlc -c parser.mli; \
-	ocamlc -c lexer.ml; \
-	ocamlc -c parser.ml; \
-	ocamlc -c compiler.ml; \
-	ocamlc -o ../Mcc mc.cmo lexer.cmo parser.cmo compiler.cmo 
+	ocamlfind ocamlc -c mc.ml -linkpkg \
+  	-package spelll; \
+	ocamlfind ocamlc -c parser.mli -linkpkg \
+  	-package spelll; \
+	ocamlfind ocamlc -c lexer.ml -linkpkg \
+  	-package spelll; \
+	ocamlfind ocamlc -c parser.ml -linkpkg \
+  	-package spelll; \
+	ocamlfind ocamlc -c compiler.ml -linkpkg \
+  	-package spelll; \
+	ocamlfind ocamlc -o ../Mcc mc.cmo lexer.cmo parser.cmo compiler.cmo -linkpkg \
+  	-package spelll 
 
 
 

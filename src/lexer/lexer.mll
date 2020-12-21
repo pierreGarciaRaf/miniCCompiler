@@ -30,6 +30,7 @@ rule token = parse
 | "if"            { IF }
 | "else"          { ELSE }
 | "while"         { WHILE }
+| "for"           { FOR }
 | "int"           { INT }
 | "void"          { VOID }
 | "bool"          { BOOL }
