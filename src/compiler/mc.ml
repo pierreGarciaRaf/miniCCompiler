@@ -46,6 +46,7 @@ exception FunctionNotDefined of string
 exception UnvalidFunctionArgumentNb of int * int * string
 exception UnvalidType of typ * typ
 exception NoMainFunction
+exception MissingSemi
 let rec getStrExprTree (exprTree : expr) : string=
     match exprTree with
       | Cst(x)    -> Printf.sprintf "Cst %i" x

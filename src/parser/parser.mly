@@ -206,6 +206,9 @@ lineCommand:
   |instr SEMI                     { $1 }
   |SEMI                           { Empty }
   |branch                         { $1 }
+  |fakeLineCommand                {raise MissingSemi}
+fakeLineCommand:
+  |instr                          { }
 seq :
   lineCommand seq                    { $1::$2 }
   | lineCommand                      { [$1] }

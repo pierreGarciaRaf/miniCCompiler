@@ -36,6 +36,9 @@ let _ =
 
   | UnvalidType (typ1, typ2) -> Printf.printf "unexpected type %s at line %i, column %i, type %s was expected\n"
   (typeToStr typ1) lexbuf.lex_curr_p.pos_lnum (lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol) (typeToStr typ2)
+
+  | MissingSemi -> Printf.printf "Missing semicolon ';' at line %i, column %i\n"
+  lexbuf.lex_start_p.pos_lnum (lexbuf.lex_start_p.pos_cnum - lexbuf.lex_start_p.pos_bol)
   
   | NoMainFunction -> Printf.printf "No main function defined\n"
 ;;
