@@ -31,6 +31,6 @@ Pour les extension:
 
 -Nous avons fait la boucle for avec sa propre definition (cela nous semblait plus facile).
 
--Toujours dans les erreurs les erreurs "did you mean '...'?" sur les variable et fonction, quand il en existe deja avec des nom similaire a deux caractère près. Pour cela nous avons utiliser le Topfind Spelll
+-Les erreurs "did you mean '...'?" sur les variable et fonction, quand il en existe deja avec des nom similaire a deux caractère près. Pour cela nous avons utiliser le Topfind Spelll
 
--l'affichage du programme en syntaxe abstraite comme dit precedement.
+-L'affichage du programme en syntaxe abstraite comme dit precedement.
